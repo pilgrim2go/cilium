@@ -6,6 +6,8 @@ BPF = bpf_lxc.o bpf_netdev.o bpf_overlay.o bpf_lb.o
 SCRIPTS = init.sh join_ep.sh leave_ep.sh run_probes.sh
 LIB := $(shell find ./lib -name '*.h')
 
+ifeq ("$(PKG_BUILD)","")
+
 all: $(BPF)
 	$(MAKE) -C go
 
@@ -28,10 +30,6 @@ bpf_lb.o:
 	$(foreach OPTS,$(LB_OPTIONS), \
 		clang ${OPTS} ${CLANG_FLAGS} -c bpf_lb.c -o $@;)
 
-clean:
-	rm -fr *.o
-	$(MAKE) -C go clean
-
 install:
 	$(INSTALL) -m 0644 -t $(DESTDIR)$(LIBDIR)/cilium/ $(BPF:.o=.c)
 	$(INSTALL) -m 0755 -t $(DESTDIR)$(LIBDIR)/cilium/ $(SCRIPTS)
@@ -43,3 +41,25 @@ install:
 		done; \
 	done
 	$(MAKE) -C go install
+
+
+else
+
+all:
+
+install:
+	$(INSTALL) -m 0644 -t $(DESTDIR)$(LIBDIR)/cilium/ $(BPF:.o=.c)
+	$(INSTALL) -m 0755 -t $(DESTDIR)$(LIBDIR)/cilium/ $(SCRIPTS)
+	$(INSTALL) -m 0644 -t $(DESTDIR)$(LIBDIR)/cilium/lib/ $(LIB)
+	for dir in `find include probes -type d`; do \
+		$(INSTALL) -m 0755 -d $(DESTDIR)$(LIBDIR)/cilium/$$dir; \
+		for f in `find $$dir -maxdepth 1 -type f`; do \
+			$(INSTALL) -m 0644 -t $(DESTDIR)$(LIBDIR)/cilium/$$dir $$f; \
+		done; \
+	done
+
+endif
+
+clean:
+	rm -fr *.o
+	$(MAKE) -C go clean

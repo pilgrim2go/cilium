@@ -1,0 +1,15 @@
+Source: cilium
+Section: net
+Priority: optional
+Version: ${VERSION}
+Maintainer: Andre Martins <andre@cilium.io>
+Homepage: https://github/cilium/cilium
+Vcs-Git: git://github/cilium/cilium.git
+Package: cilium
+Architecture: amd64
+Depends: docker-engine (>=1.12.1), clang-3.8, linux-image-4.8.0-040800-generic
+Description: Cilium - BPF & XDP for containers
+ Cilium provides fast in-kernel networking and security policy enforcement
+ for containers based on eBPF programs generated on the fly. It is an
+ experimental project aiming at enabling emerging kernel technologies such
+ as BPF and XDP for containers.
